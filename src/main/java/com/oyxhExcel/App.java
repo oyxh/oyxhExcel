@@ -12,7 +12,7 @@ public class App
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
-        File file  = new File("D:\\各地州市调查表\\各地州市调查表\\益阳（12）\\三级（5个）\\益阳市中心医院\\");
+        File file  = new File("G:\\R\\文件处理\\各地州市调查表\\");
         ReadExcel obj = new ReadExcel();
         readExcelFromFile(file,obj);
     }
