@@ -21,7 +21,7 @@ public class App
 {
     public static void main( String[] args ) throws IOException, OpenXML4JException, SAXException
     {
-<<<<<<< .mine
+
     	
     	long start = System.currentTimeMillis();
 		//ParseXlsxExcel excel = new ParseXlsxExcel("F:\\result\\C4\\result8-1.xlsx",true);
@@ -42,28 +42,7 @@ public class App
 			System.out.println(str);
 		}*/
 	 
-=======
-        System.out.println( "Hello World!" );
-        File file  = new File("G:\\R\\文件处理\\各地州市调查表\\");
-        ReadExcel obj = new ReadExcel();
-        readExcelFromFile(file,obj);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> .theirs
     }
 
     public static void readExcelFromFile(File file){
