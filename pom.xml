@@ -22,7 +22,7 @@
       <scope>test</scope>
     </dependency>
      <!-- 引入poi，解析workbook视图 -->
-        <dependency>
+      <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.0.0</version>
@@ -38,10 +38,12 @@
             <version>3.6</version>
         </dependency>
         <!-- 处理excel和上面功能是一样的-->
-        <dependency>
-            <groupId>net.sourceforge.jexcelapi</groupId>
-            <artifactId>jxl</artifactId>
-            <version>2.6.10</version>
+    
+        
+          <dependency>
+            <groupId>com.monitorjbl</groupId>
+            <artifactId>xlsx-streamer</artifactId>
+            <version>1.2.0</version>
         </dependency>
   </dependencies>
   

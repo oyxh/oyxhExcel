@@ -1,7 +1,17 @@
 package com.oyxhExcel;
 
 import java.io.File;
-import java.util.List;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.xml.sax.SAXException;
+
+
+
 
 /**
  * Hello world!
@@ -9,34 +19,40 @@ import java.util.List;
  */
 public class App 
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException, OpenXML4JException, SAXException
     {
-        System.out.println( "Hello World!" );
-        File file  = new File("D:\\各地州市调查表\\各地州市调查表\\益阳（12）\\三级（5个）\\益阳市中心医院\\");
-        ReadExcel obj = new ReadExcel();
-        readExcelFromFile(file,obj);
+    	
+    	long start = System.currentTimeMillis();
+		//ParseXlsxExcel excel = new ParseXlsxExcel("F:\\result\\C4\\result8-1.xlsx",true);
+		ParseXlsxExcel excel = new ParseXlsxExcel("F:\\test.xlsx",true);
+		excel.close();
+		HashMap<Integer, HashMap<Integer, String>> list = excel.getExcelList();
+		list.forEach((key, value) -> {
+			System.out.println("第"+key+"行");
+			for (Integer sonkey : value.keySet()) {
+		        System.out.println("第" + sonkey + "列的值:" + value.get(sonkey));
+		    }
+	    });
+		long end = System.currentTimeMillis();
+		
+		System.out.println(list.size());//19677984
+		System.out.println(end-start); //16389ms
+		/*for(String str:list) {
+			System.out.println(str);
+		}*/
+	 
     }
-/*    public static void readExcel() {
-        ReadExcel obj = new ReadExcel();
-        // 此处为我创建Excel路径：E:/zhanhj/studysrc/jxl下
-        File file = new File("D:\\各地州市调查表\\各地州市调查表\\常德（6）\\二级（3个）\\（缺表3）安乡县人民医院新冠疫情期儿科医疗现状调查表.xlsx");
-        File file1 = new File("D:\\各地州市调查表\\各地州市调查表\\益阳（12）\\三级（5个）\\益阳市中心医院\\益阳市中心医院2017-2020分科登记台账(2).xls");
-        obj.readExcel(file);
-        
-        obj.readExcel(file1);
-        
 
-    }*/
-    public static void readExcelFromFile(File file,ReadExcel obj){
+    public static void readExcelFromFile(File file){
     	
 		File[] fs = file.listFiles();
 		for(File f:fs){
 			if(f.isDirectory())	//若是目录，则递归打印该目录下的文件
-				readExcelFromFile(f,obj);
+				readExcelFromFile(f);
 			if(f.isFile())	{
 				//若是文件，直接打印
 				System.out.println(f);
-				 obj.readExcel(f);
+				
 			}
 				
 		}
