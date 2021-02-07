@@ -28,7 +28,7 @@ public class ReadExcel {
 	public void handle(CSVPrinter csvPrinter) throws IOException {
 			  
 		 for (Integer row : list.keySet()) {     
-		      //System.out.println("第"+row + "行:" );
+		     // System.out.println("第"+row + "行:" );
 		      Map<Integer, String> rowContent = list.get(row);
 		      String[] patientInfo = null;
 		      String[][] table = null;
@@ -47,6 +47,7 @@ public class ReadExcel {
 		    	  int minNum = table.length < 2?table.length:2;
 			      for(int i = 0;i<minNum;i++) {
 			    	  List<String> record = new ArrayList<String>();
+			    	  
 	    			  for(int j = 0;j<patientInfo.length;j++) {
 	    				  //System.out.print(patientInfo[j]+" ");
 	    				  record.add(patientInfo[j]);
