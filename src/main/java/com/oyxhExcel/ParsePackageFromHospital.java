@@ -1,5 +1,6 @@
 package com.oyxhExcel;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ public class ParsePackageFromHospital {
 	
 	private List<Byte> fragment = new ArrayList<Byte>();//保存上次处理后，剩余的字节
 	private int total = 0;
+	private int count = 0;
 
 	  /// <summary>
 	  /// 对外调用的方法
@@ -18,12 +20,15 @@ public class ParsePackageFromHospital {
 	  /// <param name="newReceivedData">新接收到的字节数据</param>
 	  public void ProcessData(byte[] newReceivedData)
 	  {
+		  count++;
+		  System.out.println("count:"+count);
 	    try
-	    {
+	    {	
 	    	for (byte b :newReceivedData) {
 	    		fragment.add(b);
 	    	}   //合并新字节
 			
+	    	System.out.println("ok");
 
 	     List<DRDAFrame> frames = ParseFrames();//解析帧
 	     /*  if (frames.Count > 0)
@@ -59,45 +64,77 @@ public class ParsePackageFromHospital {
 	  /// </summary>
 	  /// <param name="data"></param>
 	  /// <returns></returns>
-	  private List<DRDAFrame> ParseFrames()
+	  private List<DRDAFrame> ParseFrames() throws UnsupportedEncodingException
 	  {
 	    List<DRDAFrame> Frames = new ArrayList<DRDAFrame>();
-	    List<Integer> frameStartIndex = GetFrameFlagIndex();//List<Integer>中第一个为位置，第二个为pointcode
+	
+	   // List<Integer> frameStartIndex = GetFrameFlagIndex();//List<Integer>中第一个为位置，第二个为pointcode
 	    int frameLength=0;
-	    System.out.println("pos:"+frameStartIndex.get(0));
 	    System.out.println(fragment.size());
-	    while (frameStartIndex.size() == 2)
-	    {
-	    	 //System.out.println("pos:"+frameStartIndex.get(0));
-	      if(frameStartIndex.get(0) > 8) {
-	    	  
-	    	// System.out.println( fragment.get(0)+" "+fragment.get(1)+" "+fragment.get(3));
-	    	 
-	    	  frameLength = getInt(fragment.subList( frameStartIndex.get(0)-9, frameStartIndex.get(0)-7));
-	    	  System.out.println("frameLength:"+frameLength);
-	    	 //System.out.println("This is a "+ DDMCodeMap.map.get(frameStartIndex.get(1)));
-	    	  removeByte(  frameStartIndex.get(0)-9+frameLength);
-	    	 // System.out.println(frameStartIndex.get(0)-9+frameLength+" "+fragment.size());
-	      }else {
-	    	  
-	      }
-	    /*  int frameEndIndex = GetFrameEndIndex(data, frameStartIndex);//判断帧的结束
-	      if (frameEndIndex < 0)//帧不完整
-	      {
-	        return Frames;
-	      }
-	      byte[] OneFramebyte = GetOneFrame(data, frameStartIndex, frameEndIndex);
-	      Frames.Add(OneFramebyte);
-	      //data.RemoveRange(0, frameStartIndex);//可以有这一句，避免不完整的帧，对后续解析造成影响
-	      data.RemoveRange(frameStartIndex, frameEndIndex - frameStartIndex);//移除已经处理的数据*/
-	      frameStartIndex = GetFrameFlagIndex();
-	      System.out.println(frameStartIndex.get(0)+" :"+DDMCodeMap.map.get(frameStartIndex.get(1)));
+	    int lastDdmStart = 0;  //上一个ddm的起始点
+	    List<Byte> tempByte = new ArrayList<Byte>();
+	    boolean arriveEnd = true ;
+	    for (int i = 1; i < fragment.size() - 1 && arriveEnd;i++ ){
+	    	//System.out.println("i1:"+ i+": "+fragment.size());
+	    	tempByte.clear();
+	    	tempByte.add(this.fragment.get(i-1));
+	    	tempByte.add(this.fragment.get(i));
+	    	//System.out.println( getInt(tempByte));
+	    	for(Integer codePoint : DDMCodeMap.map.keySet()) {
+	    		//System.out.println("ok2:" + codePoint);
+	    		if(codePoint.intValue() == getInt(tempByte)) {
+	    			//System.out.println("ok3:" + codePoint);
+	    			if(i-lastDdmStart>8) {
+	    				frameLength = getInt(fragment.subList(i-9, i-7)); //DDM长度
+	    				System.out.println("i:" + i);
+	    				System.out.println("frameLength:" + frameLength);
+	    				if(frameLength + lastDdmStart >= fragment.size()) {
+	    					break;
+	    				}
+	    				List<Byte> ddmByte = fragment.subList(i+1, i-9+frameLength+1);
+	    				//boolean isDDMString = isDRDAFrame(ddmByte);  //是否ddm串
+	    				coverteByteToString(ddmByte);
+	    				/*if(isDDMString) {     //是DDMString
+
+	    				}*/
+	    				lastDdmStart = i-9+frameLength ;
+    					i = lastDdmStart -1 ;
+    					//System.out.println("daozhelile ma 2 "+i+":"+fragment.size());
+	    			}
+	    			break;
+	    		}
+	    		
+	    	}
+	    	//System.out.println("daozhelile ma "+i+":"+fragment.size());
+	    	//System.out.println("i:"+ i+": "+fragment.size());
 	    }
+	    //System.out.println("daozhelile ma ");
+	    removeByte(lastDdmStart);
 	    return Frames;
 	  }
 	 
 	 
-	  /// <summary>
+	  private void coverteByteToString(List<Byte> ddmByte) throws UnsupportedEncodingException {
+		// TODO Auto-generated method stub
+		 byte[] bbbb = new byte[ddmByte.size()];
+		 int index = 0;
+		 for(byte b:ddmByte) {
+			 bbbb[index++] = b;
+		 }
+		 System.out.println(new String(bbbb,"GBK"));
+		  char[] chars = new char[ddmByte.size()];
+		  for (int i = 0; i < ddmByte.size(); ++i) {
+		      chars[i] = (char) (ddmByte.get(i) & 0xFF);
+		     String  temp = Integer.toHexString(ddmByte.get(i) & 0xFF);
+		      System.out.print( temp);
+		  }
+		  System.out.println();
+		  String s = new String(chars);
+		  //System.out.println(s);
+	}
+
+
+	/// <summary>
 	  /// 需要根据实际情况重写
 	  /// </summary>
 	  /// <param name="frame"></param>
@@ -152,30 +189,29 @@ public class ParsePackageFromHospital {
 	  {
 		  List<Integer>  mapPos = new ArrayList<Integer>();
 		 List<Byte> tempByte = new ArrayList<Byte>();
-	    for (int i = 1; i < fragment.size() - 1 ; i++)
-	    {
-	    	tempByte.clear();
-	    	tempByte.add(this.fragment.get(i-1));
-	    	tempByte.add(this.fragment.get(i));
-	    	//System.out.println( getInt(tempByte));
-	    	for(Integer codePoint : DDMCodeMap.map.keySet()) {
-	    		if(codePoint.intValue() == getInt(tempByte)) {
-	    			if(codePoint.intValue()==5292) {
-	    				System.out.println(5292+" "+i);
-	    			}
-	    			if(i>8) {
-		    			mapPos.add(i);
-		    			mapPos.add(codePoint);
-		    			return mapPos;
-		    			
-	    			}
-
-	    		}
-	    	}
-	    }
+		 
+	    //System.out.println(lastDdmStart);
 	    return mapPos;//默认值，没有找到帧头
 	  }
 	  
+	  private boolean isDRDAFrame(List<Byte> ddmByte) {
+		  boolean rFlag = true;
+		  int frameLength = getInt(ddmByte.subList(0, 2));
+		  int cusor = 10;
+		  while(cusor < frameLength) {
+			  int paralength = getInt(ddmByte.subList(cusor, cusor+2));
+			  if(paralength < 5) {
+				  break;
+			  }
+			  cusor += getInt(ddmByte.subList(cusor, cusor+2));
+		  }
+		  if(cusor == frameLength) {
+			  rFlag = true;
+		  }else {
+			  rFlag = false;
+		  }
+		  return rFlag;
+	  }
 	  /**
 	   * 
 	  * @Title: getInt 
@@ -201,31 +237,12 @@ public class ParsePackageFromHospital {
 	  * @throws
 	   */
 	  public void removeByte(int num) {
+		  System.out.println("removebye");
 		  for (int i=0; i<num; i++) {
 			   fragment.remove(0);
 		   }
 		  total += num;
 		  System.out.println("total:"+total);
 	  }
-	  
-	 
-	  /// <summary>
-	  /// 需要根据实际情况重写
-	  /// </summary>
-	  /// <param name="datas"></param>
-	  /// <returns></returns>
-	 
-	  /// <summary>
-	  /// 获取一个完整的帧的所有字节
-	  /// </summary>
-	  /// <param name="data"></param>
-	  /// <param name="frameStartIndex">帧的开始位置</param>
-	  /// <param name="frameEndIndex">帧的结束位置</param>
-	  /// <returns></returns>
-	
-	 
-
-	 
-
 
 }

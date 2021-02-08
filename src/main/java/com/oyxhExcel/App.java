@@ -28,16 +28,16 @@ public class App
     public static void main( String[] args ) throws IOException, OpenXML4JException, SAXException
     {
     	for(Integer a:DDMCodeMap.map.keySet()) {
-    		System.out.println(a);
+    		//System.out.println(a);
     	}
     	readByteFromFile();
     	//readAllExcel();
     }
     
     public static void readByteFromFile() throws IOException {
-    	FileInputStream in=new FileInputStream("F:\\result\\pcap\\test");
+    	FileInputStream in=new FileInputStream("E:\\result\\test");
         //FileOutputStream中的文件不存在，将自动新建文件
-        OutputStream out=new FileOutputStream("F:\\result\\pcap\\test_result.txt");
+        OutputStream out=new FileOutputStream("E:\\result\\test_result.txt");
         byte[] buff=new byte[1024];
         ParsePackageFromHospital ppfh= new ParsePackageFromHospital();
         int b;
@@ -46,8 +46,8 @@ public class App
         while ((b=in.read(buff))!=-1) {
         	System.out.println(i++);
         	ppfh.ProcessData(buff);
-        	if(i>114) {
-        		break;
+        	if(i>3) {
+        		//break;
         	}
           //out.write(buff,0,b);
         }

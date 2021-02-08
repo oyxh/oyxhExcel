@@ -24,6 +24,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="G:/MyEclipse/Myeclipse2018/plugins/org.apache.commons.io_2.2.0.v201405211200.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
