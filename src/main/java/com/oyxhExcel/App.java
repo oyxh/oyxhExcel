@@ -35,9 +35,9 @@ public class App
     }
     
     public static void readByteFromFile() throws IOException {
-    	FileInputStream in=new FileInputStream("E:\\result\\test");
+    	FileInputStream in=new FileInputStream("F:\\result\\pcap\\test");
         //FileOutputStream中的文件不存在，将自动新建文件
-        OutputStream out=new FileOutputStream("E:\\result\\test_result.txt");
+        OutputStream out=new FileOutputStream("F:\\result\\pcap\\test_result.txt");
         byte[] buff=new byte[1024];
         ParsePackageFromHospital ppfh= new ParsePackageFromHospital();
         int b;

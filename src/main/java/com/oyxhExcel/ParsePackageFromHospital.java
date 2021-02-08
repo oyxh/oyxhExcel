@@ -118,21 +118,44 @@ public class ParsePackageFromHospital {
 		// TODO Auto-generated method stub
 		 byte[] bbbb = new byte[ddmByte.size()];
 		 int index = 0;
-		 for(byte b:ddmByte) {
-			 bbbb[index++] = b;
+		 List<Byte> tempByte = new ArrayList<Byte>();
+		 boolean isLenthPos = true;
+		 int secLength = 0;
+		 for(int i=2;i<ddmByte.size() - 1;i++) {  //字节前两位为0xff00 开始
+			 if(isLenthPos) {
+				 tempByte.clear();
+				 tempByte.add(ddmByte.get(i));
+				 tempByte.add(ddmByte.get(i+1));
+				 secLength = getInt(tempByte);
+				 i = i+ 1;
+				 isLenthPos = false;
+			 }else {
+				 if(secLength==0) {
+					 bbbb[index++] = 38;
+					 isLenthPos = true;
+				 }else {
+					 bbbb[index++] = ddmByte.get(i);
+					 secLength--;
+				 } 
+			 }	
 		 }
 		 System.out.println(new String(bbbb,"GBK"));
-		  char[] chars = new char[ddmByte.size()];
-		  for (int i = 0; i < ddmByte.size(); ++i) {
-		      chars[i] = (char) (ddmByte.get(i) & 0xFF);
-		     String  temp = Integer.toHexString(ddmByte.get(i) & 0xFF);
-		      System.out.print( temp);
-		  }
-		  System.out.println();
-		  String s = new String(chars);
+		 System.out.println(byte2Hex(ddmByte));
 		  //System.out.println(s);
 	}
-
+	  public  String byte2Hex(List<Byte> bytes) {
+		  StringBuffer stringBuffer = new StringBuffer();
+		  String temp = null;
+		  for (int i = 0; i < bytes.size(); i++) {
+			  temp = Integer.toHexString(bytes.get(i) & 0xFF);
+			  if (temp.length() == 1) {
+				  // 1得到一位的进行补0操作
+				  stringBuffer.append("0");
+				  }
+			  stringBuffer.append(temp);
+			  }
+		  return stringBuffer.toString();
+		  }
 
 	/// <summary>
 	  /// 需要根据实际情况重写
