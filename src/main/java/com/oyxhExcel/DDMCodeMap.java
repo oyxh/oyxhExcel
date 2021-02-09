@@ -6,7 +6,7 @@ import java.util.Map;
 public class DDMCodeMap {
 	public static Map<Integer,String> map = new HashMap<Integer,String>();  
 	static {  
-	/*	map.put(0x1041,"EXCSAT");
+		map.put(0x1041,"EXCSAT");
 		map.put(0x115e,"EXTNAM");
 		map.put(0x116d,"SRVNAM");
 		map.put(0x115a,"SRVRLSLV");
@@ -29,10 +29,10 @@ public class DDMCodeMap {
 		map.put(0x1219,"SECCHKRM");
 		map.put(0x2411,"SQLDARD");
 		map.put(0x241a,"QRYDSC");
-		map.put(0x241b,"QRYDTA");*/
-
-		//map.put(0x241a,"QRYDSC");
 		map.put(0x241b,"QRYDTA");
+		//map.put(0x2411,"SQLDARD");
+		//map.put(0x241a,"QRYDSC");
+		//map.put(0x241b,"QRYDTA");
 
 
 	}
