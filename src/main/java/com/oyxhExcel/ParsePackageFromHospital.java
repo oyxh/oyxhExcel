@@ -11,6 +11,7 @@ import java.util.Map;
 public class ParsePackageFromHospital {
 	
 	private List<Byte> fragment = new ArrayList<Byte>();//保存上次处理后，剩余的字节
+	Map<String,String> attrNameAndInfo = new HashMap<String,String>();
 	private int total = 0;
 	private int count = 0;
 
@@ -70,7 +71,7 @@ public class ParsePackageFromHospital {
 	
 	   // List<Integer> frameStartIndex = GetFrameFlagIndex();//List<Integer>中第一个为位置，第二个为pointcode
 	    int frameLength=0;
-	    System.out.println(fragment.size());
+	    //System.out.println(fragment.size());
 	    int lastDdmStart = 0;  //上一个ddm的起始点
 	    List<Byte> tempByte = new ArrayList<Byte>();
 	    boolean arriveEnd = true ;
@@ -86,8 +87,8 @@ public class ParsePackageFromHospital {
 	    			//System.out.println("ok3:" + Integer.toHexString(codePoint));
 	    			if(i-lastDdmStart>8) {
 	    				frameLength = getInt(fragment.subList(i-9, i-7)); //DDM长度
-	    				System.out.println("i:" + i);
-	    				System.out.println("frameLength:" + frameLength);
+	    				//System.out.println("i:" + i);
+	    				//System.out.println("frameLength:" + frameLength);
 	    				if(frameLength + lastDdmStart >= fragment.size()) {
 	    					break;
 	    				}
@@ -95,6 +96,8 @@ public class ParsePackageFromHospital {
 	    				//boolean isDDMString = isDRDAFrame(ddmByte);  //是否ddm串
 	    				if(codePoint.intValue()== 0x2411) {
 	    					coverteSQLNameByteToString(ddmByte);
+	    				}else if(codePoint.intValue()== 0x241b) {
+	    					coverteByteToString(ddmByte);
 	    				}
 	    				//coverteByteToString(ddmByte);
 	    				/*if(isDDMString) {     //是DDMString
@@ -117,30 +120,33 @@ public class ParsePackageFromHospital {
 	  }
 	 
 	 
-	  private void coverteSQLNameByteToString(List<Byte> ddmByte) {
+	  private void coverteSQLNameByteToString(List<Byte> ddmByte) throws UnsupportedEncodingException {
 		// TODO Auto-generated method stub
-		  System.out.println("get attr"+byte2Hex(ddmByte));
+		  //System.out.println("get attr"+byte2Hex(ddmByte));
+		  this.attrNameAndInfo.clear();
 		  List<Byte> tempByte = new ArrayList<Byte>();
 		  int arrtNum = 0;
 		  int arrLength = 0;
 		  tempByte.clear();
 		  tempByte.add(ddmByte.get(81));
 		  tempByte.add(ddmByte.get(80));
-		  System.out.println("get attr len"+byte2Hex(tempByte));
+		 // System.out.println("get attr len"+byte2Hex(tempByte));
 		  arrtNum = getInt(tempByte);
-		  System.out.println(arrtNum);
+		 // System.out.println(arrtNum);
 		  for(int i = 82;i<ddmByte.size()-1;) {   //第80个开始是字段名
 			  System.out.println(i);
 			  for(int j=0;j<arrtNum;j++) {
 				  List<Byte> attrInfo = ddmByte.subList(i+12, i+16);
-				  System.out.println(byte2Hex(attrInfo));
+				  System.out.println("attrInfo:"+byte2Hex(attrInfo));
 				  tempByte.clear();
 				  tempByte.add(ddmByte.get(i+27));
 				  tempByte.add(ddmByte.get(i+28));
 				  arrLength = getInt(tempByte);
 				  List<Byte> attrName = ddmByte.subList(i+29, i+29+arrLength);
-				  System.out.println(byte2Hex(attrName));
+				//  System.out.println(byte2Hex(attrName));
+				//  System.out.println(byte2String(attrName));
 				  i += 41+arrLength;
+				 // this.attrNameAndInfo.put(byte2String(attrName), byte2Hex(attrInfo));
 			  }
 		  }
 		
@@ -149,7 +155,7 @@ public class ParsePackageFromHospital {
 
 	private void coverteByteToString(List<Byte> ddmByte) throws UnsupportedEncodingException {
 		// TODO Auto-generated method stub
-		  System.out.println(ddmByte.size());
+		  System.out.println("Date is this:");
 		 byte[] bbbb = new byte[ddmByte.size()];
 		 int index = 0;
 		 List<Byte> tempByte = new ArrayList<Byte>();
@@ -173,8 +179,8 @@ public class ParsePackageFromHospital {
 				 } 
 			 }	
 		 }
-		 System.out.println(new String(bbbb,"GBK"));
-		 System.out.println(byte2Hex(ddmByte));
+		// System.out.println(new String(bbbb,"GBK"));
+		// System.out.println(byte2Hex(ddmByte));
 		  //System.out.println(s);
 	}
 	  public  String byte2Hex(List<Byte> bytes) {
@@ -189,6 +195,16 @@ public class ParsePackageFromHospital {
 			  stringBuffer.append(temp);
 			  }
 		  return stringBuffer.toString();
+		  }
+	  public  String byte2String(List<Byte> bytes) throws UnsupportedEncodingException {
+		  
+			 byte[] bbbb = new byte[bytes.size()];
+		  String temp = null;
+		  for (int i = 0; i < bytes.size(); i++) {
+			  bbbb[i] = bytes.get(i);			  
+		
+			  }
+		  return new String(bbbb,"GBK");
 		  }
 
 	/// <summary>
